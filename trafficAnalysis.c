@@ -85,8 +85,8 @@ int main() {
 
     // Sample input data for 24 intervals (you can replace this with actual data)
     for (int i = 0; i < INTERVALS; i++) {
-        inputData[i].speed = rand() % 120;      // Random speed (km/h)
-        inputData[i].congestion = rand() % 2500;  // Random congestion level
+        inputData[i].speed = (rand()%100) + 20;
+        inputData[i].congestion = (rand()%2000) + 500;
     }
 
     buildTree(0, 0, INTERVALS - 1);
