@@ -21,11 +21,11 @@ typedef struct {
 
 TrafficData inputData[INTERVALS];
 
-// Function to merge two nodes
+// Function to merge two nodes (now summing the values)
 SegmentNode merge(SegmentNode left, SegmentNode right) {
     SegmentNode result;
-    result.avg_speed = (left.avg_speed + right.avg_speed) / 2.0;
-    result.avg_congestion = (left.avg_congestion + right.avg_congestion) / 2.0;
+    result.avg_speed = left.avg_speed + right.avg_speed;  // Sum the speeds
+    result.avg_congestion = left.avg_congestion + right.avg_congestion;  // Sum the congestion levels
     return result;
 }
 
@@ -43,10 +43,10 @@ void buildTree(int node, int start, int end) {
     }
 }
 
-// Query the segment tree
+// Query the segment tree (sums the values within the range)
 SegmentNode query(int node, int start, int end, int l, int r) {
     if (r < start || l > end) {
-        // Return a neutral node
+        // Return a neutral node if the range is completely outside the query range
         SegmentNode neutral = {0, 0};
         return neutral;
     }
@@ -85,8 +85,8 @@ int main() {
 
     // Sample input data for 24 intervals (you can replace this with actual data)
     for (int i = 0; i < INTERVALS; i++) {
-        inputData[i].speed = (rand()%100) + 20;
-        inputData[i].congestion = (rand()%2000) + 500;
+        inputData[i].speed = (rand() % 100) + 20;  // Random speed between 20 and 119 km/h
+        inputData[i].congestion = (rand() % 2000) + 500;  // Random congestion between 500 and 2499 vehicles per hour
     }
 
     buildTree(0, 0, INTERVALS - 1);
@@ -96,18 +96,24 @@ int main() {
     printf("Your Query: ");
     scanf("%d%d", &l, &r);
 
+    // Query the segment tree
     SegmentNode result = query(0, 0, INTERVALS - 1, l, r);
-    printf("AVERAGE DATA FROM %d HOURS TO %d HOURS:\n", l, r);
-    printf("\tSpeed: %.2f kmph\n", result.avg_speed);
-    printf("\tCongestion: %d vph\n", (int)result.avg_congestion);
 
-    while (1)
-    {
-        int ch, index, newSpeed, newCongestion;
+    // Calculate the averages for the query range
+    int rangeLength = r - l + 1;
+    double averageSpeed = result.avg_speed / rangeLength;
+    double averageCongestion = result.avg_congestion / rangeLength;
+
+    // Output the results
+    printf("AVERAGE DATA FROM %d HOURS TO %d HOURS:\n", l, r);
+    printf("\tSpeed: %.2f kmph\n", averageSpeed);
+    printf("\tCongestion: %d vph\n", (int)averageCongestion);
+
+    while (1) {
+        int ch, index, newSpeed, newCongestion, newRangeLength;
         printf("UPDATE CHOICES:\n\t1. Update Node\n\t2. Update Query\nEnter your choice: ");
         scanf("%d", &ch);
-        switch (ch)
-        {
+        switch (ch) {
         case 1:
             printf("Node index to be updated: ");
             scanf("%d", &index);
@@ -118,9 +124,14 @@ int main() {
 
             // Query again after the update
             result = query(0, 0, INTERVALS - 1, l, r);
+
+            // Calculate the new averages
+            averageSpeed = result.avg_speed / rangeLength;
+            averageCongestion = result.avg_congestion / rangeLength;
+
             printf("UPDATED AVERAGE DATA FROM %d HOURS TO %d HOURS:\n", l, r);
-            printf("\tSpeed: %.2f kmph\n", result.avg_speed);
-            printf("\tCongestion: %d vph\n", (int)result.avg_congestion);
+            printf("\tSpeed: %.2f kmph\n", averageSpeed);
+            printf("\tCongestion: %d vph\n", (int)averageCongestion);
             break;
         case 2:
             printf("New Query: ");
@@ -128,12 +139,19 @@ int main() {
 
             // Query again after the update
             result = query(0, 0, INTERVALS - 1, l, r);
+            newRangeLength = r - l + 1;
+
+            // Calculate the new averages
+            averageSpeed = result.avg_speed / newRangeLength;
+            averageCongestion = result.avg_congestion / newRangeLength;
+
             printf("UPDATED AVERAGE DATA FROM %d HOURS TO %d HOURS:\n", l, r);
-            printf("\tSpeed: %.2f km/h\n", result.avg_speed);
-            printf("\tCongestion: %d vph\n", (int)result.avg_congestion);
+            printf("\tSpeed: %.2f km/h\n", averageSpeed);
+            printf("\tCongestion: %d vph\n", (int)averageCongestion);
             break;
         default:
-            printf("--------ANALYSIS TERMINATED--------");
+            printf("--------ANALYSIS TERMINATED--------\n");
+            free(segmentTree);
             exit(0);
         }
     }
