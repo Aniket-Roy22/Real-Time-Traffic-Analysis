@@ -85,7 +85,7 @@ int main() {
 
     // Sample input data for 24 intervals (you can replace this with actual data)
     for (int i = 0; i < INTERVALS; i++) {
-        inputData[i].speed = (rand() % 50) + 20;  // Random speed between 20 and 119 km/h
+        inputData[i].speed = (rand() % 50) + 20;  // Random speed between 20 and 69 km/h
         inputData[i].congestion = (rand() % 2000) + 500;  // Random congestion between 500 and 2499 vehicles per hour
     }
 
